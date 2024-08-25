@@ -76,6 +76,10 @@ pprof-check:
 access-db: 
 	mysql -h $(MYSQL_HOST) -P $(MYSQL_PORT) -u $(MYSQL_USER) -p $(MYSQL_PASS) $(MYSQL_DBNAME)
 
+# SQLクエリをmain.goから抽出する
+.PHONY: extract-sql
+extract-sql: extract-select extract-insert extract-update extract-delete
+
 # アプリケーションのログを確認する
 .PHONY: watch-service-log
 watch-service-log:
@@ -192,3 +196,19 @@ refresh-notify-slack-tmp:
 	rm -f $(NOTIFY_SLACK_TMPFILE)
 	mkdir -p tmp
 	touch $(NOTIFY_SLACK_TMPFILE)
+
+.PHONY: extract-select
+extract-select:
+	grep "\"SELECT" $(BUILD_DIR)/main.go | sed -E 's/.*"(SELECT .* FROM.*)".*/\1/' > select.sql
+
+.PHONY: extract-insert
+extract-insert:
+	grep "\"INSERT" $(BUILD_DIR)/main.go | sed -E 's/.*"(INSERT INTO .*)".*/\1/' > insert.sql
+
+.PHONY: extract-update
+extract-update:
+	grep "\"UPDATE" $(BUILD_DIR)/main.go | sed -E 's/.*"(UPDATE .*)".*/\1/' > update.sql
+
+.PHONY: extract-delete
+extract-delete:
+	grep "\"DELETE" $(BUILD_DIR)/main.go | sed -E 's/.*"(DELETE .*)".*/\1/' > delete.sql
