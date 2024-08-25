@@ -76,6 +76,11 @@ pprof-check:
 access-db: 
 	mysql -h $(MYSQL_HOST) -P $(MYSQL_PORT) -u $(MYSQL_USER) -p $(MYSQL_PASS) $(MYSQL_DBNAME)
 
+# アプリケーションのログを確認する
+.PHONY: watch-service-log
+watch-service-log:
+	sudo journalctl -u $(SERVICE_NAME) -n10 -f
+
 # 主要コマンドの構成要素 ------------------------
 
 .PHONY: install-tools
@@ -187,7 +192,3 @@ refresh-notify-slack-tmp:
 	rm -f $(NOTIFY_SLACK_TMPFILE)
 	mkdir -p tmp
 	touch $(NOTIFY_SLACK_TMPFILE)
-
-.PHONY: watch-service-log
-watch-service-log:
-	sudo journalctl -u $(SERVICE_NAME) -n10 -f
