@@ -199,16 +199,16 @@ refresh-notify-slack-tmp:
 
 .PHONY: extract-select
 extract-select:
-	grep "\"SELECT" $(BUILD_DIR)/main.go | sed -E 's/.*"(SELECT .* FROM.*)".*/\1/' > select.sql
+	find $(BUILD_DIR) -name "*.go" | xargs grep "\"SELECT" | sed -E 's/.*"(SELECT .* FROM.*)".*/\1/' > select.sql
 
 .PHONY: extract-insert
 extract-insert:
-	grep "\"INSERT" $(BUILD_DIR)/main.go | sed -E 's/.*"(INSERT INTO .*)".*/\1/' > insert.sql
+	find $(BUILD_DIR) -name "*.go" | xargs grep "\"INSERT" | sed -E 's/.*"(INSERT INTO .*)".*/\1/' > insert.sql
 
 .PHONY: extract-update
 extract-update:
-	grep "\"UPDATE" $(BUILD_DIR)/main.go | sed -E 's/.*"(UPDATE .*)".*/\1/' > update.sql
+	find $(BUILD_DIR) -name "*.go" | xargs grep "\"UPDATE" | sed -E 's/.*"(UPDATE .*)".*/\1/' > update.sql
 
 .PHONY: extract-delete
 extract-delete:
-	grep "\"DELETE" $(BUILD_DIR)/main.go | sed -E 's/.*"(DELETE .*)".*/\1/' > delete.sql
+	find $(BUILD_DIR) -name "*.go" | xargs grep "\"DELETE" | sed -E 's/.*"(DELETE .*)".*/\1/' > delete.sql
