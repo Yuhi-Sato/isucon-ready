@@ -20,7 +20,7 @@ NOTIFY_SLACK_TMPFILE:=tmp/notify-slack.txt
 
 # サーバーの環境構築　ツールのインストール、gitまわりのセットアップ
 .PHONY: setup
-setup: install-tools dir-setup git-setup
+setup: install-tools dir-setup extract-queries git-setup
 
 # 設定ファイルなどを取得してgit管理下に配置する
 .PHONY: get-conf
@@ -85,6 +85,9 @@ extract-sql: extract-select extract-insert extract-update extract-delete
 watch-service-log:
 	sudo journalctl -u $(SERVICE_NAME) -n10 -f
 
+.PHONY: extract-queries
+extract-queries: extract-select extract-insert extract-update extract-delete
+
 # 主要コマンドの構成要素 ------------------------
 
 .PHONY: install-tools
@@ -107,7 +110,7 @@ install-tools:
 
 .PHONY: dir-setup
 dir-setup:
-	mkdir -p tool-config/alp tool-config/slow-query
+	mkdir -p tool-config/alp tool-config/slow-query queries
 
 .PHONY: git-setup
 git-setup:
@@ -199,16 +202,40 @@ refresh-notify-slack-tmp:
 
 .PHONY: extract-select
 extract-select:
-	find $(BUILD_DIR) -name "*.go" | xargs grep "\"SELECT" | sed -E 's/.*"(SELECT .* FROM.*)".*/\1/' > select.sql
+	find $(BUILD_DIR) -name "*.go" | xargs grep "\"SELECT" | sed -E 's/.*"(SELECT .* FROM.*)".*/\1/' > queries/select.sql
+	echo >> queries/select.sql
+	echo ----------------------------------------- back quote queries ----------------------------------------- >> queries/select.sql
+	find $(BUILD_DIR) -name "*.go" | xargs awk '/`/ { back_quote += gsub(/`/, "`") } \
+		back_quote % 2 == 1 && /SELECT/ { select_flag = 1 } \
+		select_flag && back_quote % 2 == 1 { print } \
+		back_quote % 2 == 0 && select_flag { select_flag = 0 }' >> queries/select.sql
 
 .PHONY: extract-insert
 extract-insert:
-	find $(BUILD_DIR) -name "*.go" | xargs grep "\"INSERT" | sed -E 's/.*"(INSERT INTO .*)".*/\1/' > insert.sql
+	find $(BUILD_DIR) -name "*.go" | xargs grep "\"INSERT" | sed -E 's/.*"(INSERT INTO .*)".*/\1/' > queries/insert.sql
+	echo >> queries/insert.sql
+	echo ----------------------------------------- back quote queries ----------------------------------------- >> queries/insert.sql
+	find $(BUILD_DIR) -name "*.go" | xargs awk '/`/ { back_quote += gsub(/`/, "`") } \
+		back_quote % 2 == 1 && /INSERT/ { insert_flag = 1 } \
+		insert_flag && back_quote % 2 == 1 { print } \
+		back_quote % 2 == 0 && insert_flag { insert_flag = 0 }' >> queries/insert.sql
 
 .PHONY: extract-update
 extract-update:
-	find $(BUILD_DIR) -name "*.go" | xargs grep "\"UPDATE" | sed -E 's/.*"(UPDATE .*)".*/\1/' > update.sql
+	find $(BUILD_DIR) -name "*.go" | xargs grep "\"UPDATE" | sed -E 's/.*"(UPDATE .*)".*/\1/' > queries/update.sql
+	echo >> queries/update.sql
+	echo ----------------------------------------- back quote queries ----------------------------------------- >> queries/update.sql
+	find $(BUILD_DIR) -name "*.go" | xargs awk '/`/ { back_quote += gsub(/`/, "`") } \
+		back_quote % 2 == 1 && /UPDATE/ { update_flag = 1 } \
+		update_flag && back_quote % 2 == 1 { print } \
+		back_quote % 2 == 0 && update_flag { update_flag = 0 }' >> queries/update.sql
 
 .PHONY: extract-delete
 extract-delete:
-	find $(BUILD_DIR) -name "*.go" | xargs grep "\"DELETE" | sed -E 's/.*"(DELETE .*)".*/\1/' > delete.sql
+	find $(BUILD_DIR) -name "*.go" | xargs grep "\"DELETE" | sed -E 's/.*"(DELETE .*)".*/\1/' > queries/delete.sql
+	echo >> queries/delete.sql
+	echo ----------------------------------------- back quote queries ----------------------------------------- >> queries/delete.sql
+	find $(BUILD_DIR) -name "*.go" | xargs awk '/`/ { back_quote += gsub(/`/, "`") } \
+		back_quote % 2 == 1 && /DELETE/ { delete_flag = 1 } \
+		delete_flag && back_quote % 2 == 1 { print } \
+		back_quote % 2 == 0 && delete_flag { delete_flag = 0 }' >> queries/delete.sql
