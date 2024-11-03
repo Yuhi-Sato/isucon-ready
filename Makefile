@@ -34,6 +34,10 @@ deploy-conf: check-server-id deploy-db-conf deploy-nginx-conf deploy-envsh
 .PHONY: bench
 bench: check-server-id build rm-logs deploy-conf restart
 
+# notify_slack系をまとめて通知する
+.PHONY: ns
+ns: notify-slack-alp notify-slack-slow-query
+
 # slow queryを確認する
 .PHONY: slow-query
 slow-query: 
