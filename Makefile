@@ -1,11 +1,13 @@
-include /home/isucon/env.sh
+ifneq ("$(wildcard /home/isucon/env.sh)","")
+    include /home/isucon/env.sh
+endif
 
 # SERVER_ID: env.sh内で定義
 
 # 問題によって変わる変数
 USER:=isucon
 BIN_NAME:=app
-BUILD_DIR:=/home/isucon/private_isu/webapp/golang
+BUILD_DIR:=./go
 SERVICE_NAME:=isu-go
 
 DB_PATH:=/etc/mysql
@@ -20,7 +22,7 @@ NOTIFY_SLACK_TMPFILE:=tmp/notify-slack.txt
 
 # サーバーの環境構築　ツールのインストール、gitまわりのセットアップ
 .PHONY: setup
-setup: install-tools dir-setup extract-queries git-setup
+setup: install-tools dir-setup git-setup
 
 # 設定ファイルなどを取得してgit管理下に配置する
 .PHONY: get-conf
@@ -74,11 +76,6 @@ pprof-record:
 pprof-check: 
 	$(eval latest := $(shell ls -rt ~/pprof/ | tail -n 1))
 	go tool pprof -http=localhost:8090 ~/pprof/$(latest)
-
-# DBに接続する
-.PHONY: access-db
-access-db: 
-	mysql -h $(MYSQL_HOST) -P $(MYSQL_PORT) -u $(MYSQL_USER) -p $(MYSQL_PASS) $(MYSQL_DBNAME)
 
 # SQLクエリをmain.goから抽出する
 .PHONY: extract-sql
