@@ -34,7 +34,13 @@ deploy-conf: check-server-id deploy-db-conf deploy-nginx-conf deploy-envsh
 
 # ベンチマークを走らせる直前に実行する
 .PHONY: bench
-bench: check-server-id build rm-logs deploy-conf restart
+bench:
+	git pull 
+	make check-server-id 
+	make build
+	make rm-logs
+	make deploy-conf
+	make restart
 
 # notify_slack系をまとめて通知する
 .PHONY: ns
