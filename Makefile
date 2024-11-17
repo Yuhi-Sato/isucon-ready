@@ -118,6 +118,7 @@ install-tools:
 .PHONY: dir-setup
 dir-setup:
 	mkdir -p tool-config/alp tool-config/slow-query queries
+	touch tool-config/alp/.keep tool-config/slow-query/.keep queries/.keep
 
 .PHONY: git-setup
 git-setup:
