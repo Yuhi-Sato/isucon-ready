@@ -142,6 +142,8 @@ endif
 set-as-s1:
 	mkdir -p s1/etc/mysql s1/etc/nginx
 	cp -R /home/isucon/env.sh s1/env.sh
+	echo "" >> s1/env.sh
+	echo "" >> ~/env.sh
 	echo "SERVER_ID=s1" >> s1/env.sh
 	echo "SERVER_ID=s1" >> ~/env.sh
 
@@ -149,6 +151,8 @@ set-as-s1:
 set-as-s2:
 	mkdir -p s2/etc/mysql s2/etc/nginx
 	cp -R /home/isucon/env.sh s2/env.sh
+	echo "" >> s2/env.sh
+	echo "" >> ~/env.sh
 	echo "SERVER_ID=s2" >> s2/env.sh
 	echo "SERVER_ID=s2" >> ~/env.sh
 
@@ -156,6 +160,8 @@ set-as-s2:
 set-as-s3:
 	mkdir -p s3/etc/mysql s3/etc/nginx
 	cp -R /home/isucon/env.sh s3/env.sh
+	echo "" >> s3/env.sh
+	echo "" >> ~/env.sh
 	echo "SERVER_ID=s3" >> s3/env.sh
 	echo "SERVER_ID=s3" >> ~/env.sh
 
